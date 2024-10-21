@@ -3,14 +3,18 @@
   <p>
     <select (change)="onChangeTasksFilter(filter.value)" #filter>
       <option value="all">All</option>
-      <option value="open">Open</option>
-      <option value="in-progress">In-Progress</option>
-      <option value="done">Completed</option>
+      <option *ngFor="let option of tasksStatusOptions" [value]="option.value">
+        {{ option.text }}
+      </option>
+      <!--      <option value="open">Open</option>-->
+      <!--      <option value="in-progress">In-Progress</option>-->
+      <!--      <option value="done">Completed</option>-->
     </select>
   </p>
 </header>
 
 <ul>
+  <!--  <li *ngFor="let task of tasks()">-->
   <li *ngFor="let task of tasks">
     <app-task-item [task]="task"></app-task-item>
   </li>

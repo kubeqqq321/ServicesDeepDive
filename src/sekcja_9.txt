@@ -1,0 +1,124 @@
+Services - Serwisy
+
+serwisy -> są takimi klasami, które mogą być używane do współdzielenia logiki i danych w całej aplikacji.
+            np. w wielu komponentach
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+@Injectable({ -> mówi to angularowi, że ta klasa może być wstrzykiwana w inne klasy
+
+  providedIn: 'root' -> oznacza to że klasa jest skonfigurowana tak że można ją wstrzyknąć w dowolne miejsce w aplikacji
+
+})
+task.service.ts
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+zła praktyka na tworzenie instancji serwisu w konstruktorze
+ponieważ tworzona ona jest tylko raz w jednej klasie i użycie jej w innej klasie nie pozwoli na uzyskanie
+dostępu do tych samych danych.
+  private taskService: TaskService;
+
+  constructor() {
+    this.taskService = new TaskService();
+  }
+
+  onAddTask(title: string, description: string) {
+   this.taskService.addTask({title, description});
+  }
+
+new-task.component.ts
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+Dependency Injection - wstrzykiwanie zależności
+oznacza to, że komponenty, dyrektywy i usługi mogą żądać wartosći zależności wartosći od kórych są zależne, a
+które sa następnie dostarczane przez Angular.
+
+Idea polega na tym, że nie trzeba tworzyć instancji usług, mechanizm wstrzykiwania zależności robi to za nas.
+Chodzi o to że nie trzeba samodzielnie tworzyć tych wartości, usług, zamiast tego żąda się ich w swoich komponentach
+od Angulara. Wtedy Angular tworzy te warości i przekazuje je do komponentów, usług itp.
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+Istnieją 2 sposoby wstrzykiwania zależności:
+1. Wstrzykiwanie zależności przez konstruktor
+      constructor(private taskService: TaskService) {
+      }
+
+2. Wstrzykiwanie zależności przez metodę inject()
+    private taskService = inject(TaskService);
+tasks-list.component.ts
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+Istnieje kilka możliwości aby zarejestrować serwis w Angularze:
+1. Rejestracja serwisu w main.ts
+
+bootstrapApplication(AppComponent, {
+  providers: [TaskService]              -> w tablicy providers podajemy serwisy które chcemy zarejestrować
+}).catch((err) => console.error(err));
+podejście to spowoduje, że ten kod należący do usługi TaskService będzie zawsze dołączany do aplikacji
+
+2. Rejestracja serwisu w komponencie
+@Injectable({
+  providedIn: 'root'
+})
+W tym podejściu serwis nie zostanie dołączony odrazu od aplikacji co oznacza, że zwiększy sie wydajność aplikacji
+
+3.
+@Component({
+  selector: 'app-tasks',
+  standalone: true,
+  imports: [
+    NewTaskComponent,
+    TasksListComponent
+  ],
+  templateUrl: './tasks.component.html',
+  styleUrl: './tasks.component.css',
+  providers: [TaskService]
+})
+
+W tym podejściu serwis zostanie dołączony do komponentu oraz wszuyskich tych komponentów które są w nim zagnieżdżone w tym przypadku
+do komponentu tasks.component.ts oraz do komponentów NewTaskComponent i TasksListComponent
+
+należy pamiętać że jeżeli sie takie coś robi to trzeba mieć na uwadze to że serwis będzie dostępny tylko w tym komponencie
+wstrzyknięcie tego serwis do innych komponentów wjąże się z tym że będzie tworzona nowa instancja tego serwisu
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+Tworzenie niestandardowego dostawcy, który dostarcza wartość inną niz usługa, inną niż klasa,
+Zamiast tego dostawca dostarcza wartość, która nie jest instancją klasy, ale jest wartością prostą, funkcją, obiektem itp.
+
+task-list.component.ts oraz task-item.component.ts
+poniższy kod powinien znajdować się w komponencie rodzice i tym samym powinien być widoczny w komponencie dziecka ale tak sie nie dzieje
+nie wiem czemu !!!!!!!
+Jego wstrzyknięcie jest wtedy w obydwu komponentach
+  providers: [taskStatusOptionsProvider],
+    tasksStatusOptions = inject(TASK_STATUS_OPTIONS);
+
